@@ -3,7 +3,7 @@
 
 [![n8n Cloud Ready](https://img.shields.io/badge/n8n-Cloud%20Ready-EA4B71?style=for-the-badge&logo=n8n&logoColor=white)](https://mustrain.app.n8n.cloud)
 [![Security HMAC](https://img.shields.io/badge/Security-HMAC--SHA256-10B981?style=for-the-badge)](https://en.wikipedia.org/wiki/HMAC)
-[![Vercel Deployed](https://img.shields.io/badge/Vercel-Live%20Portal-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://speedy-emerald-48faldn.tmp.now)
+[![Vercel Deployed](https://img.shields.io/badge/Vercel-Live%20Portal-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://nimble-cyclone-suwml6q.vercel.app)
 [![Human In The Loop](https://img.shields.io/badge/Slack-sendAndWait-4A154B?style=for-the-badge&logo=slack&logoColor=white)](https://slack.com)
 [![Conference](https://img.shields.io/badge/Conference-Algeria%202.0-2563EB?style=for-the-badge)](https://algeria20.com)
 
@@ -14,7 +14,7 @@
 Ce dépôt contient l'infrastructure complète de l'atelier interactif présenté à **Algeria 2.0**.
 Plutôt qu'une présentation théorique passive, **la salle entière joue le rôle du client et tente d'attaquer en direct le workflow d'entreprise déployé sur n8n Cloud**. Chaque attaque qui échoue devant l'assistance prouve l'un des piliers essentiels de mise en production.
 
-* 🌐 **Portail Web Public (Interactif) :** [https://speedy-emerald-48faldn.tmp.now](https://speedy-emerald-48faldn.tmp.now)
+* 🌐 **Portail Web Public (Interactif) :** [https://nimble-cyclone-suwml6q.vercel.app](https://nimble-cyclone-suwml6q.vercel.app)
 * 📷 **QR Code à projeter dans la salle :** [`assets/qr-vercel.png`](file:///c:/Users/must_/OneDrive/Bureau/N8n-Workshop/assets/qr-vercel.png)
 * ⚡ **Workflow n8n de Production (36 nœuds) :** [`workflows/production/workshop-demandes-clients-production-v-finale.json`](file:///c:/Users/must_/OneDrive/Bureau/N8n-Workshop/workflows/production/workshop-demandes-clients-production-v-finale.json)
 
