@@ -1,0 +1,2 @@
+idempotency_key,customer_email,status,ticket_id,message
+"rid:init","mus@example.com","received","SUP-INIT-001","Exemple de message"

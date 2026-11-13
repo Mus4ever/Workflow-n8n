@@ -38,7 +38,8 @@
           "id": "PvZsTUNGI7vHRdjK",
           "name": "Lead Webhook HMAC Secret"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -98,169 +99,44 @@
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
-            "idempotency_key": "={{ $json.idempotency_key }}",
-            "ticket_id": "={{ $json.ticket.ticket_id }}",
+            "idempotency_key": "={{ .idempotency_key }}",
+            "ticket_id": "={{ .ticket.ticket_id }}",
             "status": "received",
-            "customer_name": "={{ $json.ticket.customer_name }}",
-            "customer_email": "={{ $json.ticket.customer_email }}",
-            "message": "={{ $json.ticket.message }}",
-            "order_id": "={{ $json.ticket.order_id }}"
+            "customer_email": "={{ .ticket.customer_email }}",
+            "message": "={{ .ticket.message }}"
           },
-          "matchingColumns": [],
           "schema": [
             {
               "id": "idempotency_key",
               "displayName": "idempotency_key",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
               "type": "string",
-              "readOnly": false,
-              "removed": false
+              "required": false
             },
             {
               "id": "ticket_id",
               "displayName": "ticket_id",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
               "type": "string",
-              "readOnly": false,
-              "removed": false
+              "required": false
             },
             {
               "id": "status",
               "displayName": "status",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
               "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "customer_name",
-              "displayName": "customer_name",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
+              "required": false
             },
             {
               "id": "customer_email",
               "displayName": "customer_email",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
               "type": "string",
-              "readOnly": false,
-              "removed": false
+              "required": false
             },
             {
               "id": "message",
               "displayName": "message",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
               "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "order_id",
-              "displayName": "order_id",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "intent",
-              "displayName": "intent",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "priority",
-              "displayName": "priority",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "analysis_source",
-              "displayName": "analysis_source",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "review_reasons",
-              "displayName": "review_reasons",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "summary",
-              "displayName": "summary",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "recommended_action",
-              "displayName": "recommended_action",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "approval_status",
-              "displayName": "approval_status",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "sheets_logged",
-              "displayName": "sheets_logged",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "boolean",
-              "readOnly": false,
-              "removed": false
+              "required": false
             }
-          ],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": false
+          ]
         },
         "options": {}
       },
@@ -627,163 +503,16 @@
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
-            "status": "={{ $json.row_status }}"
+            "status": "={{ .row_status }}"
           },
-          "matchingColumns": [],
           "schema": [
-            {
-              "id": "idempotency_key",
-              "displayName": "idempotency_key",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "ticket_id",
-              "displayName": "ticket_id",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
             {
               "id": "status",
               "displayName": "status",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
               "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "customer_name",
-              "displayName": "customer_name",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "customer_email",
-              "displayName": "customer_email",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "message",
-              "displayName": "message",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "order_id",
-              "displayName": "order_id",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "intent",
-              "displayName": "intent",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "priority",
-              "displayName": "priority",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "analysis_source",
-              "displayName": "analysis_source",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "review_reasons",
-              "displayName": "review_reasons",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "summary",
-              "displayName": "summary",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "recommended_action",
-              "displayName": "recommended_action",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "approval_status",
-              "displayName": "approval_status",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "sheets_logged",
-              "displayName": "sheets_logged",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "boolean",
-              "readOnly": false,
-              "removed": false
+              "required": false
             }
-          ],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": false
+          ]
         },
         "options": {}
       },
@@ -985,171 +714,16 @@
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
-            "status": "processed",
-            "intent": "={{ $('Finaliser le statut').first().json.intent }}",
-            "priority": "={{ $('Finaliser le statut').first().json.priority }}",
-            "analysis_source": "={{ $('Finaliser le statut').first().json.analysis_source }}",
-            "review_reasons": "={{ $('Finaliser le statut').first().json.review_reasons }}",
-            "summary": "={{ $('Finaliser le statut').first().json.summary }}",
-            "recommended_action": "={{ $('Finaliser le statut').first().json.recommended_action }}",
-            "approval_status": "={{ $('Finaliser le statut').first().json.approval_status }}",
-            "sheets_logged": "={{ !$json.error }}"
+            "status": "processed"
           },
-          "matchingColumns": [],
           "schema": [
-            {
-              "id": "idempotency_key",
-              "displayName": "idempotency_key",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "ticket_id",
-              "displayName": "ticket_id",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
             {
               "id": "status",
               "displayName": "status",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
               "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "customer_name",
-              "displayName": "customer_name",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "customer_email",
-              "displayName": "customer_email",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "message",
-              "displayName": "message",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "order_id",
-              "displayName": "order_id",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "intent",
-              "displayName": "intent",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "priority",
-              "displayName": "priority",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "analysis_source",
-              "displayName": "analysis_source",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "review_reasons",
-              "displayName": "review_reasons",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "summary",
-              "displayName": "summary",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "recommended_action",
-              "displayName": "recommended_action",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "approval_status",
-              "displayName": "approval_status",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "sheets_logged",
-              "displayName": "sheets_logged",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "boolean",
-              "readOnly": false,
-              "removed": false
+              "required": false
             }
-          ],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": false
+          ]
         },
         "options": {}
       },
@@ -1220,167 +794,16 @@
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
-            "status": "awaiting_human",
-            "intent": "={{ $json.intent }}",
-            "priority": "={{ $json.priority }}",
-            "analysis_source": "={{ $json.analysis_source }}",
-            "review_reasons": "={{ $json.review_reasons }}"
+            "status": "awaiting_human"
           },
-          "matchingColumns": [],
           "schema": [
-            {
-              "id": "idempotency_key",
-              "displayName": "idempotency_key",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "ticket_id",
-              "displayName": "ticket_id",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
             {
               "id": "status",
               "displayName": "status",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
               "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "customer_name",
-              "displayName": "customer_name",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "customer_email",
-              "displayName": "customer_email",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "message",
-              "displayName": "message",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "order_id",
-              "displayName": "order_id",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "intent",
-              "displayName": "intent",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "priority",
-              "displayName": "priority",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "analysis_source",
-              "displayName": "analysis_source",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "review_reasons",
-              "displayName": "review_reasons",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "summary",
-              "displayName": "summary",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "recommended_action",
-              "displayName": "recommended_action",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "approval_status",
-              "displayName": "approval_status",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "string",
-              "readOnly": false,
-              "removed": false
-            },
-            {
-              "id": "sheets_logged",
-              "displayName": "sheets_logged",
-              "required": false,
-              "defaultMatch": false,
-              "display": true,
-              "type": "boolean",
-              "readOnly": false,
-              "removed": false
+              "required": false
             }
-          ],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": false
+          ]
         },
         "options": {}
       },
