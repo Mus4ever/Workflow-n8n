@@ -117,8 +117,8 @@ test.describe('Workshop Algeria 2.0 - E2E Tests', () => {
     const sendBtn = page.getByRole('button', { name: /Envoyer ma demande/i });
     await sendBtn.click();
 
-    // Check that we see the outcome container (either envoi, réponse, ou stamp)
-    await expect(page.getByText(/Envoi en cours|Le workflow a répondu|Résultat|Erreur/i)).toBeVisible({ timeout: 8000 });
+    // Check that we see the outcome container (either envoi, réponse, stamp ou porte)
+    await expect(page.getByText(/Porte 1|Sans réponse|Règle validée|Réponse reçue|Envoi en cours|Attaque en cours|Conseil d'attaque/i)).toBeVisible({ timeout: 10000 });
   });
 
 });
