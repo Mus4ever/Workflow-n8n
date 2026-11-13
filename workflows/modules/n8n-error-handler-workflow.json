@@ -1,0 +1,167 @@
+{
+  "name": "Error handler: DLQ + Slack alert",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "823bbbbe-124b-519b-9cad-e69b97eb106c",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const e = $input.first().json;\nconst ex = e.execution || {};\nconst wf = e.workflow || {};\nconst errorObj = ex.error || {};\nconst message = errorObj.message || errorObj.description || 'Erreur non spécifiée';\nconst failedNode = ex.lastNodeExecuted || 'Nœud non identifié';\nconst workflowName = wf.name || 'Workshop - Traitement des demandes clients';\nconst executionId = ex.id || 'N/A';\nconst executionUrl = ex.url || ('https://mustrain.app.n8n.cloud/execution/' + executionId);\nconst now = new Date().toISOString();\n\nconst slackText = [\n  '🚨 *ALERTE PANNE WORKFLOW (DLQ)*',\n  '• *Workflow :* `' + workflowName + '`',\n  '• *Nœud en panne :* `' + failedNode + '`',\n  '• *Erreur :* _' + message + '_',\n  '• *ID Exécution :* `' + executionId + '`',\n  '• *Lien direct :* ' + executionUrl,\n  '• *Action :* Corrigez le problème puis cliquez sur *Retry execution* dans n8n.'\n].join('\\n');\n\nreturn [{\n  json: {\n    row: {\n      timestamp: now,\n      logged_at: now,\n      workflow: workflowName,\n      executionId: executionId,\n      execution_id: executionId,\n      ticket_id: 'ERR-' + executionId,\n      failedNode: failedNode,\n      error: message,\n      executionUrl: executionUrl,\n      status: 'ERROR',\n      priority: 'CRITICAL',\n      event: 'ERROR: ' + failedNode,\n      intent: message\n    },\n    slackText\n  }\n}];"
+      },
+      "id": "5ebc16e1-2d5d-5515-a6a2-cf0fc7756c49",
+      "name": "Format error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "12NUDd-pOw5g9DVe_2rLXfLtd8HkIf7dzenMz2mD9xhk",
+          "mode": "list",
+          "cachedResultName": "n8n_support_tickets",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12NUDd-pOw5g9DVe_2rLXfLtd8HkIf7dzenMz2mD9xhk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2048492992,
+          "mode": "list",
+          "cachedResultName": "Execution_Logs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12NUDd-pOw5g9DVe_2rLXfLtd8HkIf7dzenMz2mD9xhk/edit#gid=2048492992"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "execution_id": "={{ $json.row.executionId }}",
+            "ticket_id": "={{ $json.row.ticket_id }}",
+            "event": "={{ $json.row.event }}",
+            "status": "={{ $json.row.status }}",
+            "priority": "={{ $json.row.priority }}",
+            "intent": "={{ $json.row.intent }}",
+            "logged_at": "={{ $json.row.logged_at }}",
+            "workflow": "={{ $json.row.workflow }}",
+            "failedNode": "={{ $json.row.failedNode }}",
+            "error": "={{ $json.row.error }}",
+            "executionUrl": "={{ $json.row.executionUrl }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "4acdcd74-4399-5271-8996-a0929e7d4f6a",
+      "name": "Log to DLQ sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        480,
+        200
+      ],
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ot5nf3Z7DTo4Jr0i",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "all-mus",
+          "mode": "name"
+        },
+        "text": "={{ $json.slackText }}",
+        "otherOptions": {
+          "mrkdwn": true
+        }
+      },
+      "id": "e09f287f-f023-5e93-a93b-272715ec9741",
+      "name": "Slack error alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        720,
+        200
+      ],
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "hsE01x6Cwr9dQh0X",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Workflow d'erreur (DLQ + Slack)\nActivez-le dans le workflow principal : Settings > Error workflow.\nIl enregistre l'échec dans Google Sheets (onglet Execution_Logs gid=2048492992) et alerte immédiatement le canal Slack #all-mus.\nRejouez ensuite l'exécution en un clic depuis l'onglet Executions.",
+        "height": 110,
+        "width": 780,
+        "color": 3
+      },
+      "id": "448d8aab-5165-55cf-97c1-375f3d537637",
+      "name": "Note e1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        40
+      ]
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Format error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format error": {
+      "main": [
+        [
+          {
+            "node": "Log to DLQ sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log to DLQ sheet": {
+      "main": [
+        [
+          {
+            "node": "Slack error alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": true
+}

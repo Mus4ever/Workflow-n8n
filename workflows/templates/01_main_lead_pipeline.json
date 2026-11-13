@@ -1,0 +1,225 @@
+{
+  "name": "Algeria 2.0 - Lead Intelligence Pipeline (Workshop)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "workshop-lead-intake",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": false
+        }
+      },
+      "id": "41f60500-5011-4a05-81ac-d7c3fd837886",
+      "name": "Webhook - Lead Intake",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        240,
+        300
+      ],
+      "webhookId": "e376384b-7e04-4d92-a940-5e60ef9ceedb"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// WORKSHOP DEMO: replace DEMO_CHANGE_ME before exposing this endpoint.\n// In production, prefer Webhook Header Auth credentials or a secret manager.\nconst EXPECTED_SECRET = 'DEMO_CHANGE_ME';\nconst headers = $json.headers || {};\nconst supplied = headers['x-workshop-secret'] || headers['X-Workshop-Secret'];\nconst body = $json.body || {};\n\nif (supplied !== EXPECTED_SECRET) {\n  return { json: { accepted: false, httpStatus: 401, error: 'unauthorized', message: 'Invalid webhook secret' } };\n}\n\nconst name = String(body.name || '').trim().replace(/\\s+/g, ' ');\nconst email = String(body.email || '').trim().toLowerCase();\nconst company = String(body.company || '').trim();\nconst message = String(body.message || '').trim();\nconst source = String(body.source || 'website').trim();\n\nconst emailOk = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);\nif (!name || !emailOk || !message) {\n  return { json: { accepted: false, httpStatus: 400, error: 'validation_error',\n    details: { name: Boolean(name), email: emailOk, message: Boolean(message) } } };\n}\n\n// Simple deterministic key for this workshop. For production use a database unique constraint.\nconst idempotencyKey = String(body.idempotency_key || email);\nconst store = $getWorkflowStaticData('global');\nstore.seenLeads = store.seenLeads || {};\nif (store.seenLeads[idempotencyKey]) {\n  return { json: { accepted: false, duplicate: true, httpStatus: 200,\n    leadId: store.seenLeads[idempotencyKey], idempotencyKey,\n    status: 'duplicate_ignored', message: 'This lead was already processed.' } };\n}\nconst leadId = `lead_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;\nstore.seenLeads[idempotencyKey] = leadId;\n\n// PII masking before any model call. The original values stay in n8n execution data;\n// configure execution-data retention/redaction appropriately in production.\nconst maskedMessage = message\n  .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}/gi, '[EMAIL]')\n  .replace(/(\\+?\\d[\\d\\s().-]{7,}\\d)/g, '[PHONE]');\nconst maskedName = '[PERSON]';\nconst maskedEmail = '[EMAIL]';\n\nconst disposableDomains = ['mailinator.com','10minutemail.com','guerrillamail.com','tempmail.com'];\nconst domain = email.split('@')[1] || '';\nif (disposableDomains.includes(domain)) {\n  return { json: { accepted: false, httpStatus: 422, error: 'disposable_email',\n    message: 'Disposable email domains are not accepted.' } };\n}\n\nlet score = 20;\nif (company) score += 20;\nif (message.length > 40) score += 10;\nif (/\\b(demo|quote|pricing|purchase|automation|budget|devis|achat)\\b/i.test(message)) score += 30;\nif (source === 'referral') score += 10;\nscore = Math.min(score, 100);\n\nconst aiPrompt = `Classify this business lead. Return ONLY valid JSON with keys classification (high_intent|medium_intent|low_intent), summary (max 35 words), recommended_action (contact|nurture|ignore). Do not infer identity. Data: company=${company || 'unknown'}; message=${maskedMessage}; deterministic_score=${score}.`;\nreturn { json: {\n  accepted: true, duplicate: false, leadId, idempotencyKey,\n  lead: { name, email, company, message, source },\n  masked: { name: maskedName, email: maskedEmail, message: maskedMessage },\n  score, aiPrompt, piiMaskedBeforeAI: true,\n  receivedAt: new Date().toISOString()\n} };"
+      },
+      "id": "327d960a-bfb6-47c5-bc1c-a640dcb156fe",
+      "name": "Validate + Normalize + PII Mask + Idempotency",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9e4d190c-51d4-4c38-96a6-c528fda0654b",
+              "leftValue": "={{ $json.accepted }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "4334fbdf-c4b4-47c3-bc91-4d3b6d293e2e",
+      "name": "IF - Accepted?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        740,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": "={{ $json.httpStatus || 200 }}"
+        }
+      },
+      "id": "ec0a809b-8a0a-4746-ad0d-02d2d15ecd9a",
+      "name": "Respond - Reject / Duplicate",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1000,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:11434/api/chat",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { model: 'qwen2.5:3b', messages: [{ role: 'user', content: $json.aiPrompt }], stream: false, format: 'json', options: { temperature: 0.1 } } }}",
+        "options": {
+          "timeout": 20000,
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "4a70fae8-96f4-4c47-a823-46dd35a4db9f",
+      "name": "HTTP - Ollama Local AI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1000,
+        220
+      ],
+      "onError": "continueRegularOutput",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1500
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Read the normalized lead from the earlier node because HTTP Request replaces its input.\nconst base = $('Validate + Normalize + PII Mask + Idempotency').first().json;\nlet ai = null;\nlet aiLevel = 'rules_fallback';\nlet aiLatencyMs = null;\nconst started = Date.now();\n\ntry {\n  const raw = $json.message?.content || $json.body?.message?.content || '';\n  const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;\n  const allowedClass = ['high_intent','medium_intent','low_intent'];\n  const allowedAction = ['contact','nurture','ignore'];\n  if (parsed && allowedClass.includes(parsed.classification) &&\n      typeof parsed.summary === 'string' &&\n      allowedAction.includes(parsed.recommended_action)) {\n    ai = parsed;\n    aiLevel = 'ollama_local';\n    aiLatencyMs = Date.now() - started;\n  }\n} catch (e) {\n  // Invalid/unavailable model output: use deterministic rules below.\n}\nif (!ai) {\n  const classification = base.score >= 70 ? 'high_intent' : base.score >= 40 ? 'medium_intent' : 'low_intent';\n  ai = {\n    classification,\n    summary: 'Rule-based classification used because the local model was unavailable or returned invalid JSON.',\n    recommended_action: classification === 'high_intent' ? 'contact' : classification === 'medium_intent' ? 'nurture' : 'ignore'\n  };\n}\nconst audit = {\n  leadId: base.leadId,\n  executionId: $execution.id,\n  receivedAt: base.receivedAt,\n  processedAt: new Date().toISOString(),\n  score: base.score,\n  classification: ai.classification,\n  recommendedAction: ai.recommended_action,\n  aiLevel,\n  aiLatencyMs,\n  piiMaskedBeforeAI: true,\n  validation: 'passed',\n  idempotencyKey: base.idempotencyKey\n};\nreturn { json: {\n  status: 'processed',\n  leadId: base.leadId,\n  lead: base.lead,\n  score: base.score,\n  ai,\n  aiLevel,\n  piiMaskedBeforeAI: true,\n  audit,\n  nextStep: ai.recommended_action === 'contact' ? 'human_review_then_contact' : ai.recommended_action\n} };"
+      },
+      "id": "944d5516-7af7-47ee-a285-e141b222b92c",
+      "name": "Parse AI / Validate Output / Rule Fallback / Audit",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "94f8bc08-bfe3-4e9e-bf0e-0d3967407d65",
+      "name": "Respond - Processed",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1550,
+        220
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook - Lead Intake": {
+      "main": [
+        [
+          {
+            "node": "Validate + Normalize + PII Mask + Idempotency",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate + Normalize + PII Mask + Idempotency": {
+      "main": [
+        [
+          {
+            "node": "IF - Accepted?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Accepted?": {
+      "main": [
+        [
+          {
+            "node": "HTTP - Ollama Local AI",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond - Reject / Duplicate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP - Ollama Local AI": {
+      "main": [
+        [
+          {
+            "node": "Parse AI / Validate Output / Rule Fallback / Audit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI / Validate Output / Rule Fallback / Audit": {
+      "main": [
+        [
+          {
+            "node": "Respond - Processed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true
+  },
+  "versionId": "3bbe8de3-42bb-4ae0-855f-4927fd7dc429",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}

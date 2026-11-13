@@ -1,0 +1,114 @@
+[
+  {
+    "parameters": {
+      "content": "# ⚙️ WORKSHOP ALGERIA 2.0 : TRAITEMENT ROBUSTE DES DEMANDES CLIENTS\n**Architecture de production à 4 Barrières de Défense :**\n1. **Sécurité d'Entrée :** HMAC SHA-256 en temps constant + Validation stricte & anonymisation PII.\n2. **Résilience de Flux :** Idempotence anti-doublon + Débit limité (Rate limit 5 req / 10 min) via n8n Data Tables.\n3. **Réponse Découplée :** Acquittement HTTP 202 immédiat (< 200 ms) pour ne jamais bloquer le client pendant l'IA.\n4. **IA Supervisée (Human-in-the-Loop) :** Extraction structurée Zod + Validation interactive obligatoire sur Slack.\n5. **Dead-Letter Queue (DLQ) :** Relié à l'Error Workflow pour alerte Slack et reprise en 1 clic sans perte de données.",
+      "height": 200,
+      "width": 2500,
+      "color": 3
+    },
+    "id": "1ba7b9c9-3d23-40b4-a303-fcccf82cde8c",
+    "name": "Note - Bannière Globale",
+    "type": "n8n-nodes-base.stickyNote",
+    "typeVersion": 1,
+    "position": [
+      -120,
+      -560
+    ]
+  },
+  {
+    "parameters": {
+      "content": "### 🛡️ 1. PORTE DE SÉCURITÉ : SIGNATURE HMAC & VALIDATION\n**Missions testées :** Mission 2 (Sans signature), Mission 3 (Données invalides)\n• **Webhook Intake :** Reçoit le corps brut (`rawBody: true`) pour calculer l'empreinte exacte.\n• **Crypto HMAC :** Calcule `sha256` avec le secret partagé (`mus`) et compare en temps constant (anti-timing attacks).\n• **Validation & PII :** Rejette immédiatement les structures invalides (HTTP 400/401) et masque les données personnelles (`[EMAIL]`, `[TEL]`).",
+      "height": 440,
+      "width": 960,
+      "color": 4
+    },
+    "id": "e2f69826-b937-4d9a-bf4e-d0b5b7786b65",
+    "name": "Note - Barrière 1 HMAC",
+    "type": "n8n-nodes-base.stickyNote",
+    "typeVersion": 1,
+    "position": [
+      -120,
+      20
+    ]
+  },
+  {
+    "parameters": {
+      "content": "### ⚡ 2. ANTI-DOUBLONS & RATE LIMITING (DATA TABLES)\n**Missions testées :** Mission 4 (Doublons), Mission 5 (Inondation / Rafale)\n• **Enregistrement :** Sauvegarde immédiate dans la table interne n8n `support_tickets`.\n• **Recherche de doublons :** Détecte si le même message ou `request_id` a été envoyé il y a moins de 10 minutes.\n• **Contrôle de volume :** Bloque au-delà de 5 demandes par tranche de 10 min (HTTP 429).\n• **Protection des quotas :** Protège le LLM et les APIs externes contre le spam et les coûts inutiles.",
+      "height": 380,
+      "width": 620,
+      "color": 1
+    },
+    "id": "604d8145-cd9e-4d86-aaf1-bc6333790c78",
+    "name": "Note - Barrière 2 Idempotence",
+    "type": "n8n-nodes-base.stickyNote",
+    "typeVersion": 1,
+    "position": [
+      1030,
+      -320
+    ]
+  },
+  {
+    "parameters": {
+      "content": "### 🚀 3. RÉPONSE ASYNCHRONE IMMÉDIATE (DECOUPLED)\n**Mission testée :** Mission 1 (Demande normale)\n• **Règle d'or de l'ingénierie :** Ne jamais faire attendre un webhook client pendant l'appel à l'IA ou la validation humaine !\n• **HTTP 202 Accepted :** Renvoie immédiatement le `ticket_id` généré en moins de 200 ms.\n• **Aiguillage Switch :** Si doublon ou limite de débit ➜ arrêt propre ; si nouvelle demande valide ➜ passage au traitement de fond.",
+      "height": 340,
+      "width": 820,
+      "color": 7
+    },
+    "id": "1042ced1-f5dc-4d99-8601-be0039ca937c",
+    "name": "Note - Architecture Asynchrone",
+    "type": "n8n-nodes-base.stickyNote",
+    "typeVersion": 1,
+    "position": [
+      1810,
+      100
+    ]
+  },
+  {
+    "parameters": {
+      "content": "### 🧠 4. ENRICHISSEMENT EXTERNE & ANALYSE IA\n**Mission testée :** Mission 6 (Prompt Injection)\n• **API Produit :** Récupère les détails du produit sur DummyJSON (avec filet de secours si l'API est indisponible).\n• **LLM OpenRouter :** Analyse le message, extrait l'intention (remboursement, problème technique, etc.) et le sentiment.\n• **Output Parser :** Force le modèle à renvoyer un JSON rigide conforme à un schéma Zod imposé.\n• **Règles de secours :** Si l'IA échoue ou propose une action risquée (ex: remboursement > 10 000 DA), le code JavaScript de garde-fou prend le dessus.",
+      "height": 600,
+      "width": 1220,
+      "color": 5
+    },
+    "id": "bf563788-5ed7-42a0-9cd1-39ac7c37dbf2",
+    "name": "Note - Raisonnement IA",
+    "type": "n8n-nodes-base.stickyNote",
+    "typeVersion": 1,
+    "position": [
+      2400,
+      -280
+    ]
+  },
+  {
+    "parameters": {
+      "content": "### 👤 5. HUMAN-IN-THE-LOOP (VALIDATION SLACK)\n**Mission testée :** Mission 6 (L'IA propose, l'humain décide)\n• **Porte de contrôle :** Tout remboursement ou action sensible requiert obligatoirement l'accord d'un gestionnaire.\n• **Slack Interactive :** Envoi d'un message avec boutons [Approuver] / [Refuser] sur Slack avec timeout de 30 min.\n• **État d'attente :** Le ticket passe au statut `awaiting_human` dans la table n8n pendant que le workflow attend le clic.",
+      "height": 580,
+      "width": 650,
+      "color": 2
+    },
+    "id": "866b97b7-ad23-44f7-b04a-5db32fe88484",
+    "name": "Note - Barrière 4 Slack HITL",
+    "type": "n8n-nodes-base.stickyNote",
+    "typeVersion": 1,
+    "position": [
+      3780,
+      -480
+    ]
+  },
+  {
+    "parameters": {
+      "content": "### 📊 6. AUDIT GOOGLE SHEETS & CLÔTURE SUPPORT\n**Mission testée :** Mission 7 (Injection formule & mention Slack)\n• **Google Sheets :** Journalisation immuable dans `n8n_support_tickets` (onglet `Execution_Logs` / `Feuille 1`).\n• **Sanitization :** Neutralisation des formules malveillantes (`=cmd`, `@everyone`) avant écriture.\n• **Table n8n :** Clôture du ticket avec statut final (`AUTO_APPROVED`, `APPROVED` ou `REJECTED`).\n• **Notification Slack :** Annonce finale dans `#all-mus` pour l'équipe de support.\n• **Filet de sécurité :** Toute panne non interceptée est envoyée à l'Error Workflow (DLQ).",
+      "height": 400,
+      "width": 740,
+      "color": 6
+    },
+    "id": "df155efd-6aa4-4b88-8792-954953972b77",
+    "name": "Note - Audit & Clôture",
+    "type": "n8n-nodes-base.stickyNote",
+    "typeVersion": 1,
+    "position": [
+      4820,
+      -260
+    ]
+  }
+]
