@@ -5,7 +5,7 @@
   "rewrites": [
     {
       "source": "/api/n8n-webhook",
-      "destination": "https://mustrain.app.n8n.cloud/webhook/support-intake-v2"
+      "destination": "https://mus4ever.app.n8n.cloud/webhook/support-intake-v2"
     },
     {
       "source": "/(.*)",

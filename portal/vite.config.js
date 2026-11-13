@@ -9,7 +9,7 @@ export default defineConfig({
     allowedHosts: true,
     proxy: {
       '/api/n8n-webhook': {
-        target: 'https://mustrain.app.n8n.cloud',
+        target: 'https://mus4ever.app.n8n.cloud',
         changeOrigin: true,
         rewrite: () => '/webhook/support-intake-v2',
       },
@@ -21,7 +21,7 @@ export default defineConfig({
     allowedHosts: true,
     proxy: {
       '/api/n8n-webhook': {
-        target: 'https://mustrain.app.n8n.cloud',
+        target: 'https://mus4ever.app.n8n.cloud',
         changeOrigin: true,
         rewrite: () => '/webhook/support-intake-v2',
       },
