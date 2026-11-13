@@ -44,7 +44,7 @@ export async function recordAttack({
       duration_ms: durationMs || 0,
       payload: payload || {},
       response_data: responseData || {},
-    });
+    }).select().single();
     if (error) throw error;
     return data;
   } catch (err) {
@@ -68,7 +68,7 @@ export async function recordVote({ sessionId = DEFAULT_SESSION_ID, deviceId, pse
         created_at: new Date().toISOString(),
       },
       { onConflict: 'device_id,session_id' }
-    );
+    ).select().single();
     if (error) throw error;
     return data;
   } catch (err) {
