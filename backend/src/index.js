@@ -1,10 +1,8 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import { forwardToN8n, fetchN8nState } from './services/n8n.js';
 import { supabase, recordAttack, recordVote, recordParticipant, DEFAULT_SESSION_ID, isConfigured } from './services/supabase.js';
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
