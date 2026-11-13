@@ -274,7 +274,8 @@
       ],
       "retryOnFail": true,
       "maxTries": 3,
-      "waitBetweenTries": 500
+      "waitBetweenTries": 500,
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -311,7 +312,8 @@
       "retryOnFail": true,
       "maxTries": 3,
       "waitBetweenTries": 500,
-      "alwaysOutputData": true
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -587,7 +589,8 @@
           "id": "hsE01x6Cwr9dQh0X",
           "name": "Slack account"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -794,7 +797,8 @@
       ],
       "retryOnFail": true,
       "maxTries": 3,
-      "waitBetweenTries": 500
+      "waitBetweenTries": 500,
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -1159,7 +1163,8 @@
       ],
       "retryOnFail": true,
       "maxTries": 3,
-      "waitBetweenTries": 500
+      "waitBetweenTries": 500,
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -1192,7 +1197,8 @@
           "id": "hsE01x6Cwr9dQh0X",
           "name": "Slack account"
         }
-      }
+      },
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
