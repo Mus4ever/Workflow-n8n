@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
-import { SCENE_REFRESH_MS } from '../config';
-import { checkN8nHealth } from '../lib/api';
 import { load, save } from '../lib/storage';
 import { GATES, MISSIONS } from '../lib/missions';
 import Stamp from '../components/Stamp';
@@ -97,24 +95,10 @@ export default function Scene() {
       .catch(() => setQr(''));
   }, [effectiveJoinUrl]);
 
-  // Healthcheck du webhook n8n
+  // Statut n8n (statique ou vérifié à la demande, AUCUN polling en boucle pour ne pas consommer de quota n8n)
   useEffect(() => {
-    if (!live) return undefined;
-    let cancelled = false;
-    async function checkHealth() {
-      if (document.visibilityState !== 'visible') return;
-      const isOnline = await checkN8nHealth();
-      if (!cancelled) {
-        setOffline(!isOnline);
-      }
-    }
-    checkHealth();
-    const timer = setInterval(checkHealth, SCENE_REFRESH_MS);
-    return () => {
-      cancelled = true;
-      clearInterval(timer);
-    };
-  }, [live]);
+    setOffline(false);
+  }, []);
 
   // Realtime WebSocket Subscription via Supabase
   useEffect(() => {
